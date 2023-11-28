@@ -6,7 +6,8 @@ const Connect = require("./config/DBConnection");
 const app=express();
 app.use(express.json());
 app.use(express.urlencoded({extended:false}));
-app.use("/user/api",UserRoutes)
+app.use("/api/user",UserRoutes)
+// app.use("/api/admin",UserRoutes)
 
 const PORT=process.env.PORT || 3000;
 

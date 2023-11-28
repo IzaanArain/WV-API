@@ -335,7 +335,7 @@ const signout = async (req, res) => {
         message: "user not found",
       });
     }
-    const updated_user = await User.findOneAndUpdate(
+    const updated_user = await User.findByIdAndUpdate(
       id,
       { user_auth: null, is_verified: 0, otp_code: null },
       { new: true }
