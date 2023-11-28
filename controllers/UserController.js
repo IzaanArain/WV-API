@@ -52,7 +52,7 @@ const signup = async (req, res) => {
   }
 };
 
-//otp_verify
+//verify otp
 const otp_verify = async (req, res) => {
   try {
     const { id, otp_code } = req?.body;
@@ -89,26 +89,34 @@ const otp_verify = async (req, res) => {
         message: "user not found",
       });
     }
-    const token = createToken(id);
-    const verified_user = await User.findByIdAndUpdate(
-      id,
-      {
-        is_verified: true,
-        user_auth: token,
-      },
-      { new: true }
-    );
-    if(verified_user){
+    const user_otp_code = user?.otp_code;
+    if (user_otp_code === parseInt(otp_code)) {
+      const token = createToken(id);
+      const verified_user = await User.findByIdAndUpdate(
+        id,
+        {
+          is_verified: 1,
+          user_auth: token,
+        },
+        { new: true }
+      );
+      if (verified_user) {
         return res.status(200).send({
-            status:1,
-            message:"user verified",
-            user:verified_user
-        })
-    }else{
+          status: 1,
+          message: "user verified",
+          user: verified_user,
+        });
+      } else {
         return res.status(400).send({
-            status: 0,
-            message: "failed to verify user",
-          });
+          status: 0,
+          message: "failed to verify user",
+        });
+      }
+    } else {
+      return res.status(400).send({
+        status: 0,
+        message: "OTP does not match",
+      });
     }
   } catch (err) {
     console.error("error", err.message);
@@ -153,10 +161,12 @@ const signin = async (req, res) => {
       },
       { new: true }
     );
+    const user_id = login_user?._id;
     if (login_user) {
       return res.status(200).send({
         status: 1,
         message: "otp generated successfully",
+        id: user_id,
       });
     } else {
       return res.status(400).send({ status: 0, message: "login failed" });
@@ -169,4 +179,185 @@ const signin = async (req, res) => {
   }
 };
 
-module.exports = { signup, otp_verify, signin };
+const social_login = async (req, res) => {
+  try {
+    const { phone, device_token, device_type, social_token, social_type } =
+      req.body;
+    if (!social_type) {
+      return res.status(400).send({
+        status: 0,
+        message: "please enter social type",
+      });
+    } else if (!social_token) {
+      return res.status(400).send({
+        status: 0,
+        message: "please enter social token",
+      });
+    } else if (!device_token) {
+      return res.status(400).send({
+        status: 0,
+        message: "please enter social token",
+      });
+    } else if (!device_type) {
+      return res.status(400).send({
+        status: 0,
+        message: "please enter social token",
+      });
+    }
+    const user = await User.findOne({ social_token: social_token });
+    if (!user) {
+      const new_user = new User({
+        phone,
+        social_token,
+        social_type,
+        device_token,
+        device_type,
+      });
+      const social_user = await new_user.save();
+      const id = social_user?._id;
+      const token = createToken(id);
+      const update_user = await User.findByIdAndUpdate(
+        id,
+        {
+          is_verified: 1,
+          user_auth: token,
+        },
+        { new: true }
+      );
+      return res.status(200).send({
+        status: 1,
+        message: "social login successful",
+        user: update_user,
+      });
+    } else {
+      const user_deleted = user?.is_delete;
+      const user_blocked = user?.is_blocked;
+      if (user_deleted === 1) {
+        return res.status(200).send({
+          status: 0,
+          message:
+            "user account has been deleted, please contact admin for further details",
+        });
+      } else if (user_blocked === 1) {
+        return res.status(200).send({
+          status: 0,
+          message:
+            "user account has been deleted, please contact admin for further details",
+        });
+      } else {
+        const user_id = user?._id;
+        const token = createToken(user_id);
+        const update_user = await User.findOneAndUpdate(
+          { social_token },
+          {
+            user_auth: token,
+            is_verified: 1,
+            device_token,
+            device_type,
+          }
+        );
+        return res.status(200).send({
+          status: 1,
+          message: "social login successful",
+          user: update_user,
+        });
+      }
+    }
+  } catch (err) {
+    return res.status(500).send({
+      status: 0,
+      message: "Something went wrong",
+    });
+  }
+};
+
+//resend otp
+const resend_otp = async (req, res) => {
+  try {
+    const id = req.query.id;
+    if (!id) {
+      return res.status(400).send({
+        status: 0,
+        message: "please enter id",
+      });
+    } else if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).send({
+        status: 0,
+        message: "not a valid ID",
+      });
+    }
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(400).send({
+        status: 0,
+        message: "user not found",
+      });
+    }
+    const gen_otp_code = Math.floor(Math.random() * 900000) + 100000;
+    const update_user = await User.findByIdAndUpdate(
+      id,
+      { otp_code:gen_otp_code },
+      { new: true }
+    );
+    const otp_code = update_user?.otp_code;
+    return res.status(200).send({
+      status: 1,
+      message: "otp resend successfully",
+      otp_code,
+    });
+  } catch (err) {
+    return res.status(500).send({
+      status: 0,
+      message: "Something went wrong",
+    });
+  }
+};
+
+//signout
+const signout = async (req, res) => {
+  try {
+    const id = req?.query?.id;
+    if (!id) {
+      return res.status(400).send({
+        status: 0,
+        message: "please enter id",
+      });
+    } else if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).send({
+        status: 0,
+        message: "not a valid ID",
+      });
+    }
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(400).send({
+        status: 0,
+        message: "user not found",
+      });
+    }
+    const updated_user = await User.findOneAndUpdate(
+      id,
+      { user_auth: null, is_verified: 0, otp_code: null },
+      { new: true }
+    );
+    return res.status(200).send({
+      status:0,
+      message:"signout successfully",
+      user:updated_user
+    })
+  } catch (err) {
+    return res.status(500).send({
+      status: 0,
+      message: "Something went wrong",
+    });
+  }
+};
+
+module.exports = {
+  signup,
+  otp_verify,
+  signin,
+  social_login,
+  resend_otp,
+  signout,
+};

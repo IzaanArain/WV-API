@@ -24,32 +24,32 @@ const userSchema = new Schema(
       default: "",
     },
     is_verified: {
-      type: Boolean,
-      default: false,
+      type: Number,
+      default: 0,
     },
     user_auth: {
       type: String,
       default: "",
     },
     is_complete: {
-      type: Boolean,
-      default: false,
+      type: Number,
+      default: 0,
     },
     is_notification: {
-      type: Boolean,
-      default: false,
+      type: Number,
+      default: 0,
     },
     is_forgot_password: {
-      type: Boolean,
-      default: false,
+      type: Number,
+      default: 0,
     },
     is_blocked: {
-      type: Boolean,
-      default: false,
+      type: Number,
+      default: 0,
     },
     is_delete: {
-      type: Boolean,
-      default: false,
+      type: Number,
+      default: 0,
     },
     device_token: {
       type: String,
