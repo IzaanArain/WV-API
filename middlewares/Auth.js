@@ -5,6 +5,6 @@ const createToken=(id)=>{
 }
 
 const tokenValidator=async(req,res,next)=>{
-    
+
 }
-module.exports={createToken}
+module.exports={createToken,tokenValidator}
