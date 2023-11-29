@@ -406,6 +406,7 @@ const complete_profile = async (req, res) => {
     });
   }
 };
+
 module.exports = {
   signup,
   otp_verify,
