@@ -1,6 +1,7 @@
 const User = require("../models/UserModel");
 const Admin = require("../models/AdminModel");
 const OtpMailer = require("../utils/OtpMailer");
+const {createToken}=require("../middlewares/AdminAuth");
 
 const signin = async (req, res) => {
   try {
@@ -65,7 +66,7 @@ const signin = async (req, res) => {
     const user_id = user?._id;
     const matchPassword = await bcrypt.compare(typed_password, user_password);
     if (matchPassword) {
-      const token = create_token(user_id);
+      const token = createToken(user_id);
       const user = await Admin.findByIdAndUpdate(
         user_id,
         { user_auth: token },
@@ -466,22 +467,15 @@ const change_password = async (req, res) => {
 
 const admin_delete_user = async (req, res) => {
   try {
-    const admin_id = req?.admin?._id;
+    // const admin_id = req?.admin?._id;
     const user_id = req?.query?.id;
-    const admin = await User.findOne({ _id: admin_id, role: "admin" });
-    if (!admin) {
-      return res.status(400).send({
-        status: 0,
-        message: "you are not admin",
-      });
-    }
     if (!mongoose.isValidObjectId(user_id)) {
       return res.status(400).send({
         status: 0,
         message: "Not a valid user ID",
       });
     }
-    const user = await User.findOne({ _id: user_id, role: "user" });
+    const user = await User.findOne({ _id: user_id});
     if (!user) {
       return res.status(400).send({
         status: 0,
@@ -490,7 +484,7 @@ const admin_delete_user = async (req, res) => {
     }
     const del = user?.is_delete;
     const user_delete = await User.findOneAndUpdate(
-      { _id: user_id, role: "user" },
+      { _id: user_id},
       { is_delete: !del },
       { new: true }
     );
@@ -520,22 +514,15 @@ const admin_delete_user = async (req, res) => {
 
 const admin_block_user = async (req, res) => {
   try {
-    const admin_id = req?.admin?.id;
+    // const admin_id = req?.admin?.id;
     const user_id = req.query.id;
-    const admin = await User.findOne({ _id: admin_id, role: "admin" });
-    if (!admin) {
-      return res.status(400).send({
-        status: 0,
-        message: "you are not admin",
-      });
-    }
     if (!mongoose.isValidObjectId(user_id)) {
       return res.status(400).send({
         status: 0,
         message: "Not a valid user ID",
       });
     }
-    const user = await User.findOne({ _id: user_id, role: "user" });
+    const user = await User.findOne({ _id: user_id});
     if (!user) {
       return res.status(400).send({
         status: 0,
@@ -544,7 +531,7 @@ const admin_block_user = async (req, res) => {
     }
     const block = user?.is_blocked;
     const user_blocked = await User.findOneAndUpdate(
-      { _id: user_id, role: "user" },
+      { _id: user_id},
       { is_blocked: !block },
       { new: true }
     );

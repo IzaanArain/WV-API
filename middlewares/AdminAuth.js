@@ -15,7 +15,7 @@ const tokenValidator = async (req, res, next) => {
         message: "Unauthorized : Token is required",
       });
     }
-    const token_user = await Admin.findOne({ user_auth: token });
+    const token_user = await Admin.findOne({ user_auth: token,role: "admin" });
     if (!token_user) {
       return res.status(400).send({
         status: 0,
