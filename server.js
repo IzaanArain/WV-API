@@ -9,7 +9,7 @@ app.use(express.json());
 app.use(express.urlencoded({extended:false}));
 app.use("/api/user",UserRoutes);
 app.use("/api/admin",AdminRoutes);
-app.use(express.static("uploads"));
+app.use("/uploads",express.static("uploads"));
 
 const PORT=process.env.PORT || 3001;
 

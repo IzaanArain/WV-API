@@ -28,7 +28,7 @@ const signup = async (req, res) => {
     }
     const gen_otp_code = Math.floor(Math.random() * 900000) + 100000;
     if (email && gen_otp_code) {
-      OtpMailer(typed_email, gen_otp_code);
+      OtpMailer(email, gen_otp_code);
     }
     const signup_user = await User.create({
       email: email,
@@ -163,12 +163,12 @@ const signin = async (req, res) => {
       return res.status(200).send({
         status: 0,
         message:
-          "user account has been deleted, please contact admin for further details",
+          "user account has been blocked, please contact admin for further details",
       });
     } else {
       const gen_otp_code = Math.floor(Math.random() * 900000) + 100000;
       if (email && gen_otp_code) {
-        OtpMailer(typed_email, gen_otp_code);
+        OtpMailer(email, gen_otp_code);
       }
       const login_user = await User.findOneAndUpdate(
         { email },
@@ -264,7 +264,7 @@ const social_login = async (req, res) => {
         return res.status(200).send({
           status: 0,
           message:
-            "user account has been deleted, please contact admin for further details",
+            "user account has been blocked, please contact admin for further details",
         });
       } else {
         const user_id = user?._id;

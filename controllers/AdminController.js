@@ -2,6 +2,8 @@ const User = require("../models/UserModel");
 const Admin = require("../models/AdminModel");
 const OtpMailer = require("../utils/OtpMailer");
 const {createToken}=require("../middlewares/AdminAuth");
+const bcrypt=require("bcrypt");
+const mongoose=require("mongoose");
 
 const signin = async (req, res) => {
   try {
@@ -155,7 +157,7 @@ const otp_verfy = async (req, res) => {
     } else {
       const user_verfied = await Admin.findByIdAndUpdate(
         user_id,
-        { is_verified: true },
+        { is_verified: 1 },
         { new: true }
       );
       const { email, is_verified, is_forgot_password } = user_verfied;
@@ -229,7 +231,7 @@ const forgot_password = async (req, res) => {
     }
     const user_updated = await Admin.findByIdAndUpdate(
       user_id,
-      { is_verified: false, is_forgot_password: true, otp_code: gen_otp_code },
+      { is_verified: 1, is_forgot_password: 1, otp_code: gen_otp_code },
       { new: true }
     );
     const email = user_updated?.email;
@@ -469,7 +471,12 @@ const admin_delete_user = async (req, res) => {
   try {
     // const admin_id = req?.admin?._id;
     const user_id = req?.query?.id;
-    if (!mongoose.isValidObjectId(user_id)) {
+    if(!user_id){
+      return res.status(400).send({
+        status: 0,
+        message: "please enter user ID",
+      });
+    }else if (!mongoose.isValidObjectId(user_id)) {
       return res.status(400).send({
         status: 0,
         message: "Not a valid user ID",
@@ -499,7 +506,7 @@ const admin_delete_user = async (req, res) => {
     } else {
       return res.status(400).send({
         status: 1,
-        message: "User delete failed",
+        message: "User successfully restored",
         is_delete: is_delete,
       });
     }
@@ -516,7 +523,12 @@ const admin_block_user = async (req, res) => {
   try {
     // const admin_id = req?.admin?.id;
     const user_id = req.query.id;
-    if (!mongoose.isValidObjectId(user_id)) {
+    if(!user_id){
+      return res.status(400).send({
+        status: 0,
+        message: "please enter user ID",
+      });
+    }else if (!mongoose.isValidObjectId(user_id)) {
       return res.status(400).send({
         status: 0,
         message: "Not a valid user ID",
