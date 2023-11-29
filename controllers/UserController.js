@@ -1,6 +1,7 @@
 const User = require("../models/UserModel");
 const { createToken } = require("../middlewares/Auth");
 const mongoose = require("mongoose");
+const OtpMailer=require("../utils/OtpMailer");
 
 //sign up
 const signup = async (req, res) => {
@@ -26,9 +27,9 @@ const signup = async (req, res) => {
       });
     }
     const gen_otp_code = Math.floor(Math.random() * 900000) + 100000;
-    // if (email && gen_otp_code) {
-    //   OtpMailer(typed_email, gen_otp_code);
-    // }
+    if (email && gen_otp_code) {
+      OtpMailer(typed_email, gen_otp_code);
+    }
     const signup_user = await User.create({
       email: email,
       otp_code: gen_otp_code,
@@ -166,9 +167,9 @@ const signin = async (req, res) => {
       });
     } else {
       const gen_otp_code = Math.floor(Math.random() * 900000) + 100000;
-      // if (email && gen_otp_code) {
-      //   OtpMailer(typed_email, gen_otp_code);
-      // }
+      if (email && gen_otp_code) {
+        OtpMailer(typed_email, gen_otp_code);
+      }
       const login_user = await User.findOneAndUpdate(
         { email },
         {

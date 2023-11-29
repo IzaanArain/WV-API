@@ -1,5 +1,6 @@
 const User = require("../models/UserModel");
 const Admin = require("../models/AdminModel");
+const OtpMailer = require("../utils/OtpMailer");
 
 const signin = async (req, res) => {
   try {
@@ -222,6 +223,9 @@ const forgot_password = async (req, res) => {
     }
     const user_id = user?._id;
     const gen_otp_code = Math.floor(Math.random() * 900000) + 100000;
+    if (email && gen_otp_code) {
+      OtpMailer(typed_email, gen_otp_code);
+    }
     const user_updated = await Admin.findByIdAndUpdate(
       user_id,
       { is_verified: false, is_forgot_password: true, otp_code: gen_otp_code },
@@ -577,5 +581,5 @@ module.exports = {
   signout,
   change_password,
   admin_delete_user,
-  admin_block_user
+  admin_block_user,
 };
