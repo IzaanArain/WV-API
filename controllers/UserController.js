@@ -324,7 +324,8 @@ const resend_otp = async (req, res) => {
 //signout
 const signout = async (req, res) => {
   try {
-    const id = req?.query?.id;
+    // const id = req?.query?.id;
+    const id=req?.user?._id;
     if (!id) {
       return res.status(400).send({
         status: 0,
@@ -413,7 +414,30 @@ const complete_profile = async (req, res) => {
   }
 };
 
-//
+//delete profile
+const delete_profile = async (req, res) => {
+  try {
+    const user_id = req?.user._id;
+    const deleted_user = await User.findByIdAndUpdate(
+      user_id,
+      {
+        is_delete: 1,
+      },
+      { new: true }
+    );
+    return res.status(200).send({
+      status:1,
+      message:"user deleted successfully",
+      user:deleted_user
+    })
+  } catch (err) {
+    return res.status(500).send({
+      status: 0,
+      message: "Something went wrong",
+    });
+  }
+};
+
 module.exports = {
   signup,
   otp_verify,
@@ -422,4 +446,5 @@ module.exports = {
   resend_otp,
   signout,
   complete_profile,
+  delete_profile,
 };

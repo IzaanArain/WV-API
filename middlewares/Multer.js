@@ -4,6 +4,8 @@ const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     if (file.fieldname === "profile_image") {
       cb(null, "./uploads/profile_images");
+    } else if (file.fieldname === "information_image") {
+      cb(null, "./uploads/information_images");
     }
   },
   filename: (req, file, cb) => {
@@ -17,16 +19,16 @@ const storage = multer.diskStorage({
 
 const upload = multer({
   storage: storage,
-  fileFilter: (req, file, cb) => {
-    if (file.fieldname === "profile_image") {
-        // console.log("filefilter",req.files.profile_image)
-      if (!req.files.profile_image) {
-        cb(new Error("Image is required!"), false);
-      } else {
-        cb(null, true);
-      }
-    }
-  },
+  //   fileFilter: (req, file, cb) => {
+  //     if (file.fieldname === "profile_image") {
+  //         // console.log("filefilter",req.files.profile_image)
+  //       if (!req.files.profile_image) {
+  //         cb(new Error("Image is required!"), false);
+  //       } else {
+  //         cb(null, true);
+  //       }
+  //     }
+  //   },
 });
 
 module.exports = { upload };
