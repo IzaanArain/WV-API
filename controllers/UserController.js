@@ -181,8 +181,13 @@ const signin = async (req, res) => {
 
 const social_login = async (req, res) => {
   try {
-    const { social_phone, device_token, device_type, social_token, social_type } =
-      req.body;
+    const {
+      social_phone,
+      device_token,
+      device_type,
+      social_token,
+      social_type,
+    } = req.body;
     if (!social_type) {
       return res.status(400).send({
         status: 0,
@@ -315,7 +320,7 @@ const resend_otp = async (req, res) => {
     });
   }
 };
- 
+
 //signout
 const signout = async (req, res) => {
   try {
@@ -360,7 +365,7 @@ const signout = async (req, res) => {
 const complete_profile = async (req, res) => {
   try {
     const user_id = req?.user?._id;
-    const { name, contact_number} = req.body;
+    const { name, contact_number } = req.body;
     if (!name) {
       return res.status(400).send({
         status: 0,
@@ -391,6 +396,7 @@ const complete_profile = async (req, res) => {
         name,
         contact_number,
         profile_image: profileImagePath,
+        is_complete: 1,
       },
       { new: true }
     );
@@ -407,6 +413,7 @@ const complete_profile = async (req, res) => {
   }
 };
 
+//
 module.exports = {
   signup,
   otp_verify,
