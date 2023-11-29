@@ -90,6 +90,22 @@ const otp_verify = async (req, res) => {
         message: "user not found",
       });
     }
+    const user_deleted = user?.is_delete;
+    const user_blocked = user?.is_blocked;
+    if (user_deleted === 1) {
+      return res.status(200).send({
+        status: 0,
+        message:
+          "user account has been deleted, please contact admin for further details",
+      });
+    } else if (user_blocked === 1) {
+      return res.status(200).send({
+        status: 0,
+        message:
+          "user account has been blocked, please contact admin for further details",
+      });
+    }
+    
     const user_otp_code = user?.otp_code;
     if (user_otp_code === parseInt(otp_code)) {
       const token = createToken(id);
