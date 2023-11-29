@@ -8,7 +8,7 @@ router.post("/signin", signin);
 router.post("/forgot_password", forgot_password);
 router.post("/otp_verfy", otp_verfy);
 router.post("/reset_password", reset_password);
-router.post("/complete_profile",tokenValidator, complete_profile);
+router.post("/complete_profile",tokenValidator,upload.fields([{name:"profile_image",maxCount:1}]), complete_profile);
 router.post("/signout",tokenValidator, signout);
 router.post("/change_password",tokenValidator, change_password);
 router.post("/admin_block_user",tokenValidator, admin_block_user);
