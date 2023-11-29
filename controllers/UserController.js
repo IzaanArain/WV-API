@@ -150,26 +150,42 @@ const signin = async (req, res) => {
         message: "user not found",
       });
     }
-    const gen_otp_code = Math.floor(Math.random() * 900000) + 100000;
-    // if (email && gen_otp_code) {
-    //   OtpMailer(typed_email, gen_otp_code);
-    // }
-    const login_user = await User.findOneAndUpdate(
-      { email },
-      {
-        otp_code: gen_otp_code,
-      },
-      { new: true }
-    );
-    const user_id = login_user?._id;
-    if (login_user) {
+    const user_deleted = user?.is_delete;
+    const user_blocked = user?.is_blocked;
+    if (user_deleted === 1) {
       return res.status(200).send({
-        status: 1,
-        message: "otp generated successfully",
-        id: user_id,
+        status: 0,
+        message:
+          "user account has been deleted, please contact admin for further details",
+      });
+    } else if (user_blocked === 1) {
+      return res.status(200).send({
+        status: 0,
+        message:
+          "user account has been deleted, please contact admin for further details",
       });
     } else {
-      return res.status(400).send({ status: 0, message: "login failed" });
+      const gen_otp_code = Math.floor(Math.random() * 900000) + 100000;
+      // if (email && gen_otp_code) {
+      //   OtpMailer(typed_email, gen_otp_code);
+      // }
+      const login_user = await User.findOneAndUpdate(
+        { email },
+        {
+          otp_code: gen_otp_code,
+        },
+        { new: true }
+      );
+      const user_id = login_user?._id;
+      if (login_user) {
+        return res.status(200).send({
+          status: 1,
+          message: "otp generated successfully",
+          id: user_id,
+        });
+      } else {
+        return res.status(400).send({ status: 0, message: "login failed" });
+      }
     }
   } catch (err) {
     return res.status(500).send({
@@ -325,7 +341,7 @@ const resend_otp = async (req, res) => {
 const signout = async (req, res) => {
   try {
     // const id = req?.query?.id;
-    const id=req?.user?._id;
+    const id = req?.user?._id;
     if (!id) {
       return res.status(400).send({
         status: 0,
@@ -426,10 +442,10 @@ const delete_profile = async (req, res) => {
       { new: true }
     );
     return res.status(200).send({
-      status:1,
-      message:"user deleted successfully",
-      user:deleted_user
-    })
+      status: 1,
+      message: "user deleted successfully",
+      user: deleted_user,
+    });
   } catch (err) {
     return res.status(500).send({
       status: 0,
