@@ -315,7 +315,7 @@ const resend_otp = async (req, res) => {
     });
   }
 };
-
+ 
 //signout
 const signout = async (req, res) => {
   try {
