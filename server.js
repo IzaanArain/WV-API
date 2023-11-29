@@ -9,7 +9,7 @@ app.use(express.urlencoded({extended:false}));
 app.use("/api/user",UserRoutes)
 // app.use("/api/admin",UserRoutes)
 
-const PORT=process.env.PORT || 3000;
+const PORT=process.env.PORT || 3001;
 
 Connect().then(()=>{
     app.listen(PORT,()=>{
