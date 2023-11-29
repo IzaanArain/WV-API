@@ -353,7 +353,6 @@ const signout = async (req, res) => {
   }
 };
 
-
 module.exports = {
   signup,
   otp_verify,
