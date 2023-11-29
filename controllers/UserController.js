@@ -181,7 +181,7 @@ const signin = async (req, res) => {
 
 const social_login = async (req, res) => {
   try {
-    const { phone, device_token, device_type, social_token, social_type } =
+    const { social_phone, device_token, device_type, social_token, social_type } =
       req.body;
     if (!social_type) {
       return res.status(400).send({
@@ -207,7 +207,7 @@ const social_login = async (req, res) => {
     const user = await User.findOne({ social_token: social_token });
     if (!user) {
       const new_user = new User({
-        phone,
+        social_phone,
         social_token,
         social_type,
         device_token,
