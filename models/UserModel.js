@@ -11,7 +11,11 @@ const userSchema = new Schema(
       type: String,
       default: "",
     },
-    phone: {
+    social_phone: {
+      type: String,
+      default: "",
+    },
+    contact_number:{
       type: String,
       default: "",
     },

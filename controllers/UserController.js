@@ -254,6 +254,9 @@ const social_login = async (req, res) => {
             is_verified: 1,
             device_token,
             device_type,
+          },
+          {
+            new: true,
           }
         );
         return res.status(200).send({
@@ -296,7 +299,7 @@ const resend_otp = async (req, res) => {
     const gen_otp_code = Math.floor(Math.random() * 900000) + 100000;
     const update_user = await User.findByIdAndUpdate(
       id,
-      { otp_code:gen_otp_code },
+      { otp_code: gen_otp_code },
       { new: true }
     );
     const otp_code = update_user?.otp_code;
@@ -341,10 +344,10 @@ const signout = async (req, res) => {
       { new: true }
     );
     return res.status(200).send({
-      status:0,
-      message:"signout successfully",
-      user:updated_user
-    })
+      status: 0,
+      message: "signout successfully",
+      user: updated_user,
+    });
   } catch (err) {
     return res.status(500).send({
       status: 0,
@@ -353,6 +356,56 @@ const signout = async (req, res) => {
   }
 };
 
+//complete profile
+const complete_profile = async (req, res) => {
+  try {
+    const user_id = req?.user?._id;
+    const { name, contact_number} = req.body;
+    if (!name) {
+      return res.status(400).send({
+        status: 0,
+        message: "please enter name",
+      });
+    } else if (!contact_number) {
+      return res.status(400).send({
+        status: 0,
+        message: "please enter phone number",
+      });
+    } else if (
+      !contact_number.match(
+        /^(\+\d{1,2}\s?)?(\d{10}|\d{3}[-\.\s]?\d{3}[-\.\s]?\d{4}|\(\d{3}\)[-\.\s]?\d{3}[-\.\s]?\d{4})$/
+      )
+    ) {
+      return res.status(400).send({
+        status: 0,
+        message: "please enter valid phone number",
+      });
+    }
+    const profileImage = req?.files?.profile_image;
+    const profileImagePath = profileImage
+      ? profileImage[0]?.path.replace(/\\/g, "/")
+      : null;
+    const user = await User.findByIdAndUpdate(
+      user_id,
+      {
+        name,
+        contact_number,
+        profile_image: profileImagePath,
+      },
+      { new: true }
+    );
+    return res.status(200).send({
+      status: 1,
+      message: "complete profile successful",
+      user,
+    });
+  } catch (err) {
+    return res.status(500).send({
+      status: 0,
+      message: "Something went wrong",
+    });
+  }
+};
 module.exports = {
   signup,
   otp_verify,
@@ -360,4 +413,5 @@ module.exports = {
   social_login,
   resend_otp,
   signout,
+  complete_profile,
 };
