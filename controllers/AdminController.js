@@ -1,9 +1,9 @@
 const User = require("../models/UserModel");
 const Admin = require("../models/AdminModel");
 const OtpMailer = require("../utils/OtpMailer");
-const {createToken}=require("../middlewares/AdminAuth");
-const bcrypt=require("bcrypt");
-const mongoose=require("mongoose");
+const { createToken } = require("../middlewares/AdminAuth");
+const bcrypt = require("bcrypt");
+const mongoose = require("mongoose");
 
 const signin = async (req, res) => {
   try {
@@ -443,7 +443,7 @@ const change_password = async (req, res) => {
     const user_password = req?.user?.password;
     const matchPassword = await bcrypt.compare(password, user_password);
     if (matchPassword) {
-      await User.findByIdAndUpdate(
+      await Admin.findByIdAndUpdate(
         user_id,
         { password: hashedPassword },
         { new: true }
@@ -467,22 +467,46 @@ const change_password = async (req, res) => {
   }
 };
 
+const getAllUsers = async (req, res) => {
+  try {
+    const users=await User.find({}).sort({ createdAt: -1 });;
+    if(users?.length<1){
+      return res.status(400).send({
+        status:0,
+        message:"users not found!"
+      })
+    }else{
+      return res.status(200).send({
+        status:1,
+        message:"users fetched successfully",
+        users
+      })
+    }
+  } catch (err) {
+    console.error("Error", err.message);
+    return res.status(500).send({
+      status: 0,
+      message: "Something went wrong",
+    });
+  }
+};
+
 const admin_delete_user = async (req, res) => {
   try {
     // const admin_id = req?.admin?._id;
     const user_id = req?.query?.id;
-    if(!user_id){
+    if (!user_id) {
       return res.status(400).send({
         status: 0,
         message: "please enter user ID",
       });
-    }else if (!mongoose.isValidObjectId(user_id)) {
+    } else if (!mongoose.isValidObjectId(user_id)) {
       return res.status(400).send({
         status: 0,
         message: "Not a valid user ID",
       });
     }
-    const user = await User.findOne({ _id: user_id});
+    const user = await User.findOne({ _id: user_id });
     if (!user) {
       return res.status(400).send({
         status: 0,
@@ -491,7 +515,7 @@ const admin_delete_user = async (req, res) => {
     }
     const del = user?.is_delete;
     const user_delete = await User.findOneAndUpdate(
-      { _id: user_id},
+      { _id: user_id },
       { is_delete: !del },
       { new: true }
     );
@@ -523,18 +547,18 @@ const admin_block_user = async (req, res) => {
   try {
     // const admin_id = req?.admin?.id;
     const user_id = req.query.id;
-    if(!user_id){
+    if (!user_id) {
       return res.status(400).send({
         status: 0,
         message: "please enter user ID",
       });
-    }else if (!mongoose.isValidObjectId(user_id)) {
+    } else if (!mongoose.isValidObjectId(user_id)) {
       return res.status(400).send({
         status: 0,
         message: "Not a valid user ID",
       });
     }
-    const user = await User.findOne({ _id: user_id});
+    const user = await User.findOne({ _id: user_id });
     if (!user) {
       return res.status(400).send({
         status: 0,
@@ -543,7 +567,7 @@ const admin_block_user = async (req, res) => {
     }
     const block = user?.is_blocked;
     const user_blocked = await User.findOneAndUpdate(
-      { _id: user_id},
+      { _id: user_id },
       { is_blocked: !block },
       { new: true }
     );
@@ -579,6 +603,7 @@ module.exports = {
   complete_profile,
   signout,
   change_password,
+  getAllUsers,
   admin_delete_user,
   admin_block_user,
 };

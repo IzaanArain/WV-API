@@ -1,8 +1,9 @@
 const User = require("../models/UserModel");
 const { createToken } = require("../middlewares/Auth");
 const mongoose = require("mongoose");
-const OtpMailer=require("../utils/OtpMailer");
-
+const OtpMailer = require("../utils/OtpMailer");
+const BookService = require("../models/BookServicesModel");
+const Service = require("../models/ServicesModel");
 //sign up
 const signup = async (req, res) => {
   try {
@@ -105,7 +106,7 @@ const otp_verify = async (req, res) => {
           "user account has been blocked, please contact admin for further details",
       });
     }
-    
+
     const user_otp_code = user?.otp_code;
     if (user_otp_code === parseInt(otp_code)) {
       const token = createToken(id);
@@ -471,6 +472,37 @@ const delete_profile = async (req, res) => {
   }
 };
 
+//book service
+const book_service = async (req, res) => {
+  try {
+    const user_id = req?.user?._id;
+    const id = req?.query?.id;
+    if (!id) {
+      return res.status(400).send({
+        status: 0,
+        message: "please enter ID",
+      });
+    } else if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).send({
+        status: 0,
+        message: "please enter a valid ID",
+      });
+    };
+    const service=await Service.findById(id);
+    if(!service){
+      return res.status(400).send({
+        status: 0,
+        message: "service not found",
+      });
+    };
+    
+  } catch (err) {
+    return res.status(500).send({
+      status: 0,
+      message: "Something went wrong",
+    });
+  }
+};
 module.exports = {
   signup,
   otp_verify,
@@ -480,4 +512,5 @@ module.exports = {
   signout,
   complete_profile,
   delete_profile,
+  book_service,
 };
