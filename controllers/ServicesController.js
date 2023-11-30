@@ -201,7 +201,8 @@ const getServiceDetails=async(req,res)=>{
       message: "Something went wrong",
     });
   }
-}
+};
+
 module.exports = {
   createService,
   editService,
