@@ -22,7 +22,6 @@ router.get("/get_content",tokenValidator,getContent);
 router.post("create_service",tokenValidator,createService);
 router.post("edit_service",tokenValidator,editService);
 router.post("delete_service",tokenValidator,deleteService);
-router.post("book_service",tokenValidator)
 
 
 module.exports = router;
