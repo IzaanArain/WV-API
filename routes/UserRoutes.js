@@ -15,7 +15,7 @@ router.post("/signout",tokenValidator,signout);
 router.post("/delete_profile",tokenValidator,delete_profile);
 router.post("/book_service",tokenValidator,book_service);
 /********** Service *************/
-router.post("get_all_service",tokenValidator,getAllServices);
-router.post("get_service_details",tokenValidator,getServiceDetails);
-router.post("book_service",tokenValidator,book_service)
+router.post("/get_all_service",tokenValidator,getAllServices);
+router.post("/get_service_details",tokenValidator,getServiceDetails);
+router.post("/book_service",tokenValidator,book_service)
 module.exports=router;

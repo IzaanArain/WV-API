@@ -19,10 +19,10 @@ router.post("/admin_delete_user",tokenValidator, admin_delete_user);
 router.post("/create_content",upload.fields([{name:"company_image",maxCount:1}]),tokenValidator, createContent);
 router.get("/get_content",tokenValidator,getContent);
 /********** Service *************/
-router.post("create_service",tokenValidator,createService);
-router.post("edit_service",tokenValidator,editService);
-router.post("delete_service",tokenValidator,deleteService);
-router.post("get_all_service",tokenValidator,getAllServices);
-router.post("get_service_details",tokenValidator,getServiceDetails);
+router.post("/create_service",tokenValidator,createService);
+router.post("/edit_service",tokenValidator,editService);
+router.post("/delete_service",tokenValidator,deleteService);
+router.post("/get_all_service",tokenValidator,getAllServices);
+router.post("/get_service_details",tokenValidator,getServiceDetails);
 
 module.exports = router;
