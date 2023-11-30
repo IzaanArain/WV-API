@@ -487,15 +487,54 @@ const book_service = async (req, res) => {
         status: 0,
         message: "please enter a valid ID",
       });
-    };
-    const service=await Service.findById(id);
-    if(!service){
+    }
+    const service = await Service.findById(id);
+    if (!service) {
       return res.status(400).send({
         status: 0,
         message: "service not found",
       });
-    };
-    
+    }
+    const book_service = await BookService.findOne({
+      user_id: user_id,
+      service_id: id,
+    });
+    if (book_service) {
+      const booked_service_id = book_service?._id;
+      const is_booked = book_service?.is_booked;
+      const update_book_service = await BookService.findByIdAndUpdate(
+        booked_service_id,
+        {
+          is_booked: !is_booked,
+        },
+        { new: true }
+      );
+      if (is_booked) {
+        return res.status(200).send({
+          status: 1,
+          message: "service has been successfully booked",
+          booked_service: update_book_service,
+        });
+      } else {
+        return res.status(200).send({
+          status: 1,
+          message: "service booking has been canceled",
+          booked_service: update_book_service,
+        });
+      }
+    } else {
+      const booking_service=new BookService({
+        user_id: user_id,
+        service_id: id,
+        is_booked:1
+      });
+      const booked_service=await booking_service.save();
+      return res.status(200).send({
+        status:1,
+        message:"service has been successfully booked",
+        booked_service
+      })
+    }
   } catch (err) {
     return res.status(500).send({
       status: 0,
@@ -503,6 +542,7 @@ const book_service = async (req, res) => {
     });
   }
 };
+
 module.exports = {
   signup,
   otp_verify,

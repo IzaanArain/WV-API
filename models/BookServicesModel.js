@@ -8,6 +8,11 @@ const bookServiceSchema = new Schema(
       ref: "user",
       default: null,
     },
+    service_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "service",
+      default: null,
+    },
     is_booked: {
       type: Number,
       default: 0,
@@ -16,4 +21,4 @@ const bookServiceSchema = new Schema(
   { timestamps: true }
 );
 
-module.exports=mongoose.model("book_service",bookServiceSchema);
+module.exports = mongoose.model("book_service", bookServiceSchema);
