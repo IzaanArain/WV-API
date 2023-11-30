@@ -15,6 +15,6 @@ router.post("/change_password",tokenValidator, change_password);
 router.post("/admin_block_user",tokenValidator, admin_block_user);
 router.post("/admin_delete_user",tokenValidator, admin_delete_user);
 /********** Content *************/
-router.post("/create_content",tokenValidator, createContent);
+router.post("/create_content",upload.fields([{name:"company_image",maxCount:1}]),tokenValidator, createContent);
 
 module.exports = router;

@@ -14,10 +14,6 @@ const serviceSchema = new Schema({
         type: String,
         default:""
     },
-    is_booked:{
-        type:Number,
-        default:0,
-    }
 },
     { timestamps: true }
 );
