@@ -17,5 +17,6 @@ router.post("/book_service",tokenValidator,book_service);
 /********** Service *************/
 router.post("/get_all_service",tokenValidator,getAllServices);
 router.post("/get_service_details",tokenValidator,getServiceDetails);
-router.post("/book_service",tokenValidator,book_service)
+router.post("/book_service",tokenValidator,book_service);
+
 module.exports=router;
