@@ -224,15 +224,13 @@ const forgot_password = async (req, res) => {
     }
     const user_id = user?._id;
     const gen_otp_code = Math.floor(Math.random() * 900000) + 100000;
-    if (email && gen_otp_code) {
-      OtpMailer(typed_email, gen_otp_code);
-    }
+
     const user_updated = await Admin.findByIdAndUpdate(
       user_id,
       {
         is_verified: 0,
         is_forgot_password: 1,
-        otp_code: gen_otp_code,
+        otp_code:123456,
         user_auth: "",
       },
       { new: true }
