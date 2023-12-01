@@ -16,9 +16,9 @@ const createService = async (req, res) => {
         message: "please enter content",
       });
     }
-    const serviceImage = req?.files?.company_image;
+    const serviceImage = req?.files?.service_image;
     const serviceImagePath = serviceImage
-      ? contentImage[0]?.path?.replace(/\\/g, "/")
+      ? serviceImage[0]?.path?.replace(/\\/g, "/")
       : null;
     const service = await Service.create({
       title,
@@ -28,7 +28,7 @@ const createService = async (req, res) => {
     return res.status(200).send({
       status: 1,
       message: "service created succesfully",
-      service: service,
+      data: service,
     });
   } catch (err) {
     console.error("Error", err.message);
@@ -70,23 +70,24 @@ const editService = async (req, res) => {
         message: "service not found",
       });
     }
-    const serviceImage = req?.files?.company_image;
+    const serviceImage = req?.files?.service_image;
     const serviceImagePath = serviceImage
-      ? contentImage[0]?.path?.replace(/\\/g, "/")
+      ? serviceImage[0]?.path?.replace(/\\/g, "/")
       : null;
+      console.log(serviceImagePath)
     const update_service = await Service.findByIdAndUpdate(
       id,
       {
         title,
         content,
-        serviceImage: serviceImagePath,
+        service_image: serviceImagePath,
       },
       { new: true }
     );
     return res.status(200).send({
       status: 1,
       message: "updated service successfully!",
-      service: update_service,
+      data: update_service,
     });
   } catch (err) {
     console.error("Error", err.message);

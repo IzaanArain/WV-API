@@ -19,8 +19,8 @@ router.post("/admin_delete_user",tokenValidator, admin_delete_user);
 router.get("/get_content",tokenValidator,getContent);
 router.post("/edit_content",upload.fields([{name:"company_image",maxCount:1}]),tokenValidator,editContent);
 /********** Service *************/
-router.post("/create_service",tokenValidator,createService);
-router.post("/edit_service",tokenValidator,editService);
+router.post("/create_service",upload.fields([{name:"service_image",maxCount:1}]),tokenValidator,createService);
+router.post("/edit_service",upload.fields([{name:"service_image",maxCount:1}]),tokenValidator,editService);
 router.post("/delete_service",tokenValidator,deleteService);
 router.post("/get_all_service",tokenValidator,getAllServices);
 router.post("/get_service_details",tokenValidator,getServiceDetails);
