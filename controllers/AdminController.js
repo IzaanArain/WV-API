@@ -7,7 +7,10 @@ const mongoose = require("mongoose");
 
 const signin = async (req, res) => {
   try {
-    const { email: typed_email, password: typed_password } = req.body;
+    const {
+      email: typed_email,
+      password: typed_password,
+    } = req.body;
     if (!typed_email) {
       return res.status(400).send({
         status: 0,
@@ -36,7 +39,7 @@ const signin = async (req, res) => {
           "Password should include at least 8 characters, one uppercase letter, one lowercase letter, one digit, and one special character.",
       });
     }
-    const user = await Admin.findOne({ email: typed_email });
+    const user = await Admin.findOne({ email: typed_email?.toLowerCase() });
     if (!user) {
       return res.status(400).send({
         status: 0,
@@ -71,13 +74,13 @@ const signin = async (req, res) => {
       const token = createToken(user_id);
       const user = await Admin.findByIdAndUpdate(
         user_id,
-        { user_auth: token },
+        { user_auth: token},
         { new: true }
       );
       return res.status(200).send({
         status: 0,
         message: "logged in succesfully",
-        user,
+        data: user,
       });
     } else {
       return res.status(400).send({
@@ -94,20 +97,18 @@ const signin = async (req, res) => {
   }
 };
 
-const otp_verfy = async (req, res) => {
+const otp_verify = async (req, res) => {
   try {
-    const { email: typed_email, otp_code: typed_otp_code } = req.body;
-    if (!typed_email) {
+    const { id, otp_code: typed_otp_code } = req.body;
+    if (id) {
       return res.status(400).send({
         status: 0,
-        message: "please enter email",
+        message: "please enter ID",
       });
-    } else if (
-      !typed_email.match(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/)
-    ) {
+    } else if (!mongoose.isValidObjectId(id)) {
       return res.status(400).send({
         status: 0,
-        message: "please enter valid email",
+        message: "please enter valid ID",
       });
     } else if (!typed_otp_code) {
       return res.status(400).send({
@@ -126,7 +127,7 @@ const otp_verfy = async (req, res) => {
       });
     }
 
-    const user = await Admin.findOne({ email: typed_email });
+    const user = await Admin.findById(id);
     if (!user) {
       return res.status(400).send({
         status: 0,
@@ -160,21 +161,18 @@ const otp_verfy = async (req, res) => {
         { is_verified: 1 },
         { new: true }
       );
-      const { email, is_verified, is_forgot_password } = user_verfied;
+      const { _id, is_verified, is_forgot_password } = user_verfied;
       if (is_forgot_password) {
         res.status(200).send({
           status: 1,
           message: "OTP successfully verified",
-          email,
-          is_verified,
-          is_forgot_password,
+          data: user_verfied,
         });
       } else {
         res.status(200).send({
           status: 1,
           message: "OTP successfully verified",
-          email,
-          is_verified,
+          data: user_verfied,
         });
       }
     }
@@ -203,7 +201,7 @@ const forgot_password = async (req, res) => {
         message: "please enter valid email",
       });
     }
-    const user = await Admin.findOne({ email: email_typed });
+    const user = await Admin.findOne({ email: email_typed?.toLowerCase() });
     if (!user) {
       return res.status(400).send({
         status: 0,
@@ -231,14 +229,19 @@ const forgot_password = async (req, res) => {
     }
     const user_updated = await Admin.findByIdAndUpdate(
       user_id,
-      { is_verified: 1, is_forgot_password: 1, otp_code: gen_otp_code },
+      {
+        is_verified: 0,
+        is_forgot_password: 1,
+        otp_code: gen_otp_code,
+        user_auth: "",
+      },
       { new: true }
     );
-    const email = user_updated?.email;
+    const Updated_user_id = user_updated?.id;
     return res.status(200).send({
       status: 0,
       message: "forgot password successfully",
-      email,
+      data: { id: Updated_user_id },
     });
   } catch (err) {
     console.error("Error", err.message);
@@ -251,18 +254,31 @@ const forgot_password = async (req, res) => {
 
 const reset_password = async (req, res) => {
   try {
-    const { email: typed_email, password: typed_password } = req.body;
-    if (!typed_email) {
+    const { id, confirmPassword, password: typed_password } = req.body;
+    if (id) {
       return res.status(400).send({
         status: 0,
-        message: "please enter email",
+        message: "please enter ID",
+      });
+    } else if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).send({
+        status: 0,
+        message: "please enter valid ID",
+      });
+    } else if (!confirmPassword) {
+      return res.status(400).send({
+        status: 0,
+        message: "please enter password",
       });
     } else if (
-      !typed_email.match(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/)
+      !confirmPassword.match(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
+      )
     ) {
       return res.status(400).send({
         status: 0,
-        message: "please enter valid email",
+        message:
+          "Password should include at least 8 characters, one uppercase letter, one lowercase letter, one digit, and one special character.",
       });
     } else if (!typed_password) {
       return res.status(400).send({
@@ -280,7 +296,13 @@ const reset_password = async (req, res) => {
           "Password should include at least 8 characters, one uppercase letter, one lowercase letter, one digit, and one special character.",
       });
     }
-    const user = await Admin.findOne({ email: typed_email });
+    if (typed_password != confirmPassword) {
+      return res.status(400).send({
+        status: 0,
+        message: "New Password and Confirm New Password must be same",
+      });
+    }
+    const user = await Admin.findById(id);
     if (!user) {
       return res.status(400).send({
         status: 0,
@@ -386,7 +408,7 @@ const signout = async (req, res) => {
     const user_id = req?.admin?._id;
     const signout_user = await Admin.findByIdAndUpdate(
       user_id,
-      { user_auth: null },
+      { user_auth: null},
       { new: true }
     );
     return res.status(200).send({
@@ -405,7 +427,7 @@ const signout = async (req, res) => {
 const change_password = async (req, res) => {
   try {
     const user_id = req?.admin?._id;
-    const { password, new_password } = req.body;
+    const { password, new_password, confirmNewPassword } = req.body;
     if (!password) {
       return res.status(400).send({
         status: 0,
@@ -435,6 +457,31 @@ const change_password = async (req, res) => {
         status: 0,
         message:
           "Password should include at least 8 characters, one uppercase letter, one lowercase letter, one digit, and one special character.",
+      });
+    } else if (!confirmNewPassword) {
+      return res.status(400).send({
+        status: 0,
+        message: "please enter password",
+      });
+    } else if (
+      !confirmNewPassword.match(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
+      )
+    ) {
+      return res.status(400).send({
+        status: 0,
+        message:
+          "Password should include at least 8 characters, one uppercase letter, one lowercase letter, one digit, and one special character.",
+      });
+    } else if (new_password !== confirmNewPassword) {
+      return res.status(400).send({
+        status: 0,
+        message: "New Password and Confirm New Password should be same",
+      });
+    } else if (password == new_password || password == confirmNewPassword) {
+      return res.status(400).send({
+        status: 0,
+        message: "Current password and new password can't be same",
       });
     }
     const saltRounds = 10;
@@ -469,18 +516,18 @@ const change_password = async (req, res) => {
 
 const getAllUsers = async (req, res) => {
   try {
-    const users=await User.find({}).sort({ createdAt: -1 });;
-    if(users?.length<1){
+    const users = await User.find({}).sort({ createdAt: -1 });
+    if (users?.length < 1) {
       return res.status(400).send({
-        status:0,
-        message:"users not found!"
-      })
-    }else{
+        status: 0,
+        message: "users not found!",
+      });
+    } else {
       return res.status(200).send({
-        status:1,
-        message:"users fetched successfully",
-        users
-      })
+        status: 1,
+        message: "users fetched successfully",
+        users,
+      });
     }
   } catch (err) {
     console.error("Error", err.message);
@@ -494,7 +541,7 @@ const getAllUsers = async (req, res) => {
 const admin_delete_user = async (req, res) => {
   try {
     // const admin_id = req?.admin?._id;
-    const user_id = req?.query?.id;
+    const user_id = req?.params?.id;
     if (!user_id) {
       return res.status(400).send({
         status: 0,
@@ -525,13 +572,11 @@ const admin_delete_user = async (req, res) => {
       res.status(200).send({
         status: 1,
         message: "User deleted successfully",
-        is_delete: is_delete,
       });
     } else {
       return res.status(400).send({
         status: 1,
         message: "User successfully restored",
-        is_delete: is_delete,
       });
     }
   } catch (err) {
@@ -546,7 +591,7 @@ const admin_delete_user = async (req, res) => {
 const admin_block_user = async (req, res) => {
   try {
     // const admin_id = req?.admin?.id;
-    const user_id = req.query.id;
+    const user_id = req.params.id;
     if (!user_id) {
       return res.status(400).send({
         status: 0,
@@ -577,13 +622,11 @@ const admin_block_user = async (req, res) => {
       res.status(200).send({
         status: 1,
         message: `User ${user_email} is blocked`,
-        is_blocked: is_blocked,
       });
     } else {
       res.status(200).send({
         status: 1,
         message: `User ${user_email} is unblocked`,
-        is_blocked: is_blocked,
       });
     }
   } catch (err) {
@@ -599,7 +642,7 @@ module.exports = {
   signin,
   forgot_password,
   reset_password,
-  otp_verfy,
+  otp_verify,
   complete_profile,
   signout,
   change_password,

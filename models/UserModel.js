@@ -62,19 +62,19 @@ const userSchema = new Schema(
     },
     device_token: {
       type: String,
-      default: "123456789",
+      default: "",
     },
     device_type: {
       type: String,
-      default: "Android",
+      default: "",
     },
     social_token: {
       type: String,
-      default: "987654321",
+      default: "",
     },
     social_type: {
       type: String,
-      default: "facebook",
+      default: "",
     },
   },
   {

@@ -6,7 +6,7 @@ const OtpMailer = require("../utils/OtpMailer");
 //sign up
 const signup = async (req, res) => {
   try {
-    const email = req?.body?.email;
+    const { email } = req?.body;
     if (!email) {
       return res.status(400).send({
         status: 0,
@@ -39,7 +39,7 @@ const signup = async (req, res) => {
       return res.status(200).send({
         status: 1,
         message: "sign up successful",
-        id: user_id,
+        data: { id: user_id },
       });
     } else {
       return res.status(400).send({ status: 0, message: "sign up failed" });
@@ -56,7 +56,7 @@ const signup = async (req, res) => {
 //verify otp
 const otp_verify = async (req, res) => {
   try {
-    const { id, otp_code } = req?.body;
+    const { id, otp_code, device_token, device_type } = req?.body;
     if (!id) {
       return res.status(400).send({
         status: 0,
@@ -114,6 +114,8 @@ const otp_verify = async (req, res) => {
         {
           is_verified: 1,
           user_auth: token,
+          device_token,
+          device_type
         },
         { new: true }
       );
@@ -121,7 +123,7 @@ const otp_verify = async (req, res) => {
         return res.status(200).send({
           status: 1,
           message: "user verified",
-          user: verified_user,
+          data: verified_user,
         });
       } else {
         return res.status(400).send({
@@ -198,7 +200,7 @@ const signin = async (req, res) => {
         return res.status(200).send({
           status: 1,
           message: "otp generated successfully",
-          id: user_id,
+          data: { id: user_id },
         });
       } else {
         return res.status(400).send({ status: 0, message: "login failed" });
@@ -265,7 +267,7 @@ const social_login = async (req, res) => {
       return res.status(200).send({
         status: 1,
         message: "social login successful",
-        user: update_user,
+        data: update_user,
       });
     } else {
       const user_deleted = user?.is_delete;
@@ -300,7 +302,7 @@ const social_login = async (req, res) => {
         return res.status(200).send({
           status: 1,
           message: "social login successful",
-          user: update_user,
+          data: update_user,
         });
       }
     }
@@ -315,7 +317,7 @@ const social_login = async (req, res) => {
 //resend otp
 const resend_otp = async (req, res) => {
   try {
-    const id = req.query.id;
+    const id = req?.params?.id;
     if (!id) {
       return res.status(400).send({
         status: 0,
@@ -340,11 +342,11 @@ const resend_otp = async (req, res) => {
       { otp_code: gen_otp_code },
       { new: true }
     );
-    const otp_code = update_user?.otp_code;
+    const user_id = update_user?._id;
     return res.status(200).send({
       status: 1,
       message: "otp resend successfully",
-      otp_code,
+      data: { id: user_id },
     });
   } catch (err) {
     return res.status(500).send({
@@ -379,13 +381,19 @@ const signout = async (req, res) => {
     }
     const updated_user = await User.findByIdAndUpdate(
       id,
-      { user_auth: null, is_verified: 0, otp_code: null },
+      {
+        user_auth: null,
+        is_verified: 0,
+        otp_code: null,
+        device_token: null,
+        device_token: null,
+      },
       { new: true }
     );
     return res.status(200).send({
       status: 0,
       message: "signout successfully",
-      user: updated_user,
+      data: updated_user,
     });
   } catch (err) {
     return res.status(500).send({
@@ -437,7 +445,7 @@ const complete_profile = async (req, res) => {
     return res.status(200).send({
       status: 1,
       message: "complete profile successful",
-      user,
+      data: user,
     });
   } catch (err) {
     return res.status(500).send({
@@ -461,7 +469,6 @@ const delete_profile = async (req, res) => {
     return res.status(200).send({
       status: 1,
       message: "user deleted successfully",
-      user: deleted_user,
     });
   } catch (err) {
     return res.status(500).send({
