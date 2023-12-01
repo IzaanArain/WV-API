@@ -1,5 +1,48 @@
 const Content = require("../models/ContentModel");
 
+const getContent = async (req, res) => {
+  try {
+    const type = req?.body?.type;
+    const types = [
+      "privacy_policy",
+      "terms_and_conditions",
+      "about_us",
+      "help_and_support",
+      "information",
+    ];
+    if (!type) {
+      return res.status(400).send({
+        status: 0,
+        message: "please enter a content type",
+      });
+    } else if (!types.includes(type)) {
+      return res.status(400).send({
+        status: 0,
+        message: `Accepted types are limited to the following: "privacy_policy", "terms_and_conditions", "about_us", "help_and_support", and "information".`,
+      });
+    }
+    const content = await Content.findOne({ content_type: type });
+    if (!content) {
+      return res.status(400).send({
+        status: 0,
+        message: "content not found",
+      });
+    } else {
+      return res.status(200).send({
+        status: 1,
+        message: `fetched ${type} successfully`,
+        content,
+      });
+    }
+  } catch (err) {
+    console.error("error", err.message);
+    return res.status(500).send({
+      status: 0,
+      message: "Something went wrong",
+    });
+  }
+};
+
 const createContent = async (req, res) => {
   try {
     const { title, content, type } = req.body;
@@ -62,9 +105,9 @@ const createContent = async (req, res) => {
   }
 };
 
-const getContent = async (req, res) => {
+const editContent = async (req, res) => {
   try {
-    const type = req?.body?.type;
+    const { type, title, content } = req?.body;
     const types = [
       "privacy_policy",
       "terms_and_conditions",
@@ -83,19 +126,26 @@ const getContent = async (req, res) => {
         message: `Accepted types are limited to the following: "privacy_policy", "terms_and_conditions", "about_us", "help_and_support", and "information".`,
       });
     }
-    const content = await Content.findOne({ content_type: type });
-    if (!content) {
+    const content_exists = await Content.findOne({ content_type: type });
+    if (!content_exists) {
       return res.status(400).send({
         status: 0,
         message: "content not found",
       });
-    } else {
-      return res.status(200).send({
-        status: 1,
-        message: `fetched ${type} successfully`,
-        content,
-      });
     }
+    const update_content = await Content.findOneAndUpdate(
+      { content_type: type },
+      {
+        title,
+        content,
+      },
+      { new: true }
+    );
+    return res.status(200).send({
+      status: 1,
+      message: "content updated successfully!",
+      content: update_content,
+    });
   } catch (err) {
     console.error("error", err.message);
     return res.status(500).send({
@@ -105,95 +155,4 @@ const getContent = async (req, res) => {
   }
 };
 
-// const editContent = async (req, res) => {
-//   try {
-//     const { type, title, content } = req?.body;
-//     const types = [
-//       "privacy_policy",
-//       "terms_and_conditions",
-//       "about_us",
-//       "help_and_support",
-//       "information",
-//     ];
-//     if (!type) {
-//       return res.status(400).send({
-//         status: 0,
-//         message: "please enter a content type",
-//       });
-//     } else if (!types.includes(type)) {
-//       return res.status(400).send({
-//         status: 0,
-//         message: `Accepted types are limited to the following: "privacy_policy", "terms_and_conditions", "about_us", "help_and_support", and "information".`,
-//       });
-//     }
-//     const content_exists = await Content.findOne({ content_type: type });
-//     if (!content_exists) {
-//       return res.status(400).send({
-//         status: 0,
-//         message: "content not found",
-//       });
-//     }
-//     const update_content = await Content.findOneAndUpdate(
-//       { content_type: type },
-//       {
-//         title,
-//         content,
-//       },
-//       { new: true }
-//     );
-//     return res.status(200).send({
-//       status:1,
-//       message:"content updated successfully!",
-//       content:update_content
-//     });
-//   } catch (err) {
-//     console.error("error", err.message);
-//     return res.status(500).send({
-//       status: 0,
-//       message: "Something went wrong",
-//     });
-//   }
-// };
-
-// const deleteContent=async(req,res)=>{
-//   try{
-//     const { type} = req?.body?.type;
-//     const types = [
-//       "privacy_policy",
-//       "terms_and_conditions",
-//       "about_us",
-//       "help_and_support",
-//       "information",
-//     ];
-//     if (!type) {
-//       return res.status(400).send({
-//         status: 0,
-//         message: "please enter a content type",
-//       });
-//     } else if (!types.includes(type)) {
-//       return res.status(400).send({
-//         status: 0,
-//         message: `Accepted types are limited to the following: "privacy_policy", "terms_and_conditions", "about_us", "help_and_support", and "information".`,
-//       });
-//     }
-//     const content_exists = await Content.findOne({ content_type: type });
-//     if (!content_exists) {
-//       return res.status(400).send({
-//         status: 0,
-//         message: "content not found",
-//       });
-//     }
-//     await Content.findOneAndDelete({content_type: type})
-//     return res.status(200).send({
-//       status:1,
-//       message:"content updated successfully!",
-//     });
-//   }catch(err){
-//     return res.status(500).send({
-//       status: 0,
-//       message: "Something went wrong",
-//     });
-//   }
-// }
-
-module.exports = { createContent, getContent};
+module.exports = { createContent, getContent,editContent };
