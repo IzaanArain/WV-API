@@ -118,6 +118,12 @@ const deleteService = async (req, res) => {
         message: "service not found",
       });
     }
+    await BookService.findOneAndDelete({ service_id:id});
+    await Service.findByIdAndDelete(id);
+    return res.status(200).send({
+      status:1,
+      message:"service deleted successfully",
+    })
   } catch (err) {
     console.error("Error", err.message);
     return res.status(500).send({
