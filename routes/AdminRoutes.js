@@ -2,7 +2,7 @@ const express = require("express");
 const { upload } = require("../middlewares/Multer");
 const { signin, forgot_password, reset_password, otp_verfy,signout, complete_profile, change_password, admin_block_user, admin_delete_user } = require("../controllers/AdminController");
 const { tokenValidator } = require("../middlewares/AdminAuth");
-const { createContent, getContent, editContent } = require("../controllers/ContentController");
+const { getContent, editContent } = require("../controllers/ContentController");
 const { createService, editService, deleteService,getAllServices,getServiceDetails } = require("../controllers/ServicesController");
 const router = express.Router();
 
@@ -18,7 +18,6 @@ router.post("/admin_delete_user",tokenValidator, admin_delete_user);
 /********** Content *************/
 router.get("/get_content",tokenValidator,getContent);
 router.post("/edit_content",upload.fields([{name:"company_image",maxCount:1}]),tokenValidator,editContent);
-router.post("/create_content",upload.fields([{name:"company_image",maxCount:1}]),tokenValidator, createContent);
 /********** Service *************/
 router.post("/create_service",tokenValidator,createService);
 router.post("/edit_service",tokenValidator,editService);

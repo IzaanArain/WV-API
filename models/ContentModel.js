@@ -16,7 +16,7 @@ const contentSchema = new Schema({
     },
     content_type: {
         type: String,
-        enum: ['privacy_policy', 'terms_and_conditions', 'about_us','help_and_support','information'],
+        enum: ['privacy_policy', 'terms_and_conditions', 'about_us','information'],
         default:""
     }
 },
