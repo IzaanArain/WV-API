@@ -117,23 +117,6 @@ const deleteService = async (req, res) => {
         message: "service not found",
       });
     }
-    const del = service?.is_delete;
-    const update_service = await Service.findByIdAndUpdate(
-      id,
-      { is_delete: !del },
-      { new: true }
-    );
-    if (del) {
-      return res.status(200).send({
-        status: 1,
-        message: "service deleted successfully",
-      });
-    } else {
-      return res.status(200).send({
-        status: 1,
-        message: "service restored successfully",
-      });
-    }
   } catch (err) {
     console.error("Error", err.message);
     return res.status(500).send({
