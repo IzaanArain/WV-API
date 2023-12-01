@@ -317,7 +317,7 @@ const social_login = async (req, res) => {
 //resend otp
 const resend_otp = async (req, res) => {
   try {
-    const id = req?.params?.id;
+    const id = req?.query?.id;
     if (!id) {
       return res.status(400).send({
         status: 0,

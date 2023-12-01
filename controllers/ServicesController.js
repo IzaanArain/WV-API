@@ -99,7 +99,7 @@ const editService = async (req, res) => {
 
 const deleteService = async (req, res) => {
   try {
-    const id = req?.params?.id;
+    const id = req?.query?.id;
     if (!id) {
       return res.status(400).send({
         status: 0,
@@ -159,7 +159,7 @@ const getAllServices = async (req, res) => {
 
 const getServiceDetails=async(req,res)=>{
   try{
-    const id=req?.params?.id;
+    const id=req?.query?.id;
     if (!id) {
       return res.status(400).send({
         status: 0,
@@ -197,7 +197,7 @@ const getServiceDetails=async(req,res)=>{
 const book_service = async (req, res) => {
   try {
     const user_id = req?.user?._id;
-    const id = req?.params?.id;
+    const id = req?.query?.id;
     if (!id) {
       return res.status(400).send({
         status: 0,

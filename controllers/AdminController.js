@@ -541,7 +541,7 @@ const getAllUsers = async (req, res) => {
 const admin_delete_user = async (req, res) => {
   try {
     // const admin_id = req?.admin?._id;
-    const user_id = req?.params?.id;
+    const user_id = req?.query?.id;
     if (!user_id) {
       return res.status(400).send({
         status: 0,
@@ -591,7 +591,7 @@ const admin_delete_user = async (req, res) => {
 const admin_block_user = async (req, res) => {
   try {
     // const admin_id = req?.admin?.id;
-    const user_id = req.params.id;
+    const user_id = req?.query.id;
     if (!user_id) {
       return res.status(400).send({
         status: 0,

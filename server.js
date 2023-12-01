@@ -1,11 +1,17 @@
 const express = require("express");
 require("dotenv").config();
+const cors=require("cors");
 const UserRoutes = require("./routes/UserRoutes");
 const AdminRoutes = require("./routes/AdminRoutes");
 const Connect = require("./config/DBConnection");
 const dbSeeder = require("./utils/TcPp");
-
 const app = express();
+Connect();
+
+const server = require('http').createServer(app);
+app.use(cors({
+  origin: '*'
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use("/api/user", UserRoutes);
@@ -47,11 +53,9 @@ dbSeeder().then((contents) => {
 });
 
   
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3011;
 
-Connect().then(() => {
-  app.listen(PORT, () => {
-    console.log(`Server Running on PORT ${PORT}`);
-    console.log(`Server Running on PORT http://localhost:${PORT}/user/api/`);
-  });
+server.listen(PORT, () => {
+  console.log(`Server Running on PORT ${PORT}`);
+  console.log(`Server Running on PORT http://localhost:${PORT}/user/api/`);
 });
