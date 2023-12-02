@@ -146,7 +146,7 @@ const getAllServices = async (req, res) => {
       return res.status(200).send({
         status:1,
         message:"fetched all services",
-        services
+        data: services
       })
     }
   } catch (err) {
@@ -182,7 +182,7 @@ const getServiceDetails=async(req,res)=>{
       return res.status(200).send({
         status: 0,
         message: "service fetched successfully",
-        service
+        data: service
       });
     }
   }catch(err){
@@ -235,13 +235,13 @@ const book_service = async (req, res) => {
         return res.status(200).send({
           status: 1,
           message: "service has been successfully booked",
-          booked_service: update_book_service,
+          data: update_book_service,
         });
       } else {
         return res.status(200).send({
           status: 1,
           message: "service booking has been canceled",
-          booked_service: update_book_service,
+          data: update_book_service,
         });
       }
     } else {
@@ -254,7 +254,7 @@ const book_service = async (req, res) => {
       return res.status(200).send({
         status:1,
         message:"service has been successfully booked",
-        booked_service
+        data: booked_service
       })
     }
   } catch (err) {

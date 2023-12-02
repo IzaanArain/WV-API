@@ -31,7 +31,7 @@ const getContent = async (req, res) => {
       return res.status(200).send({
         status: 1,
         message: `fetched ${type} successfully`,
-        content,
+        data: content,
       });
     }
   } catch (err) {
@@ -80,14 +80,14 @@ const editContent = async (req, res) => {
       {
         title,
         content,
-        company_image:contentImagePath
+        company_image: contentImagePath,
       },
       { new: true }
     );
     return res.status(200).send({
       status: 1,
       message: "content updated successfully!",
-      content: update_content,
+      data: update_content,
     });
   } catch (err) {
     console.error("error", err.message);
@@ -98,4 +98,4 @@ const editContent = async (req, res) => {
   }
 };
 
-module.exports = { getContent,editContent };
+module.exports = { getContent, editContent };
