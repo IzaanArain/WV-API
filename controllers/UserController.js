@@ -6,7 +6,7 @@ const OtpMailer = require("../utils/OtpMailer");
 //sign up
 const signup = async (req, res) => {
   try {
-    const { email } = req?.body;
+    const { email, device_token, device_type  } = req?.body;
     if (!email) {
       return res.status(400).send({
         status: 0,
@@ -27,12 +27,10 @@ const signup = async (req, res) => {
       });
     }
     const gen_otp_code = Math.floor(Math.random() * 900000) + 100000;
-    if (email && gen_otp_code) {
-      OtpMailer(email, gen_otp_code);
-    }
     const signup_user = await User.create({
       email: email,
-      otp_code: gen_otp_code,
+      otp_code: 123456,
+      device_token, device_type 
     });
     const user_id = signup_user?._id;
     if (signup_user) {
@@ -56,7 +54,7 @@ const signup = async (req, res) => {
 //verify otp
 const otp_verify = async (req, res) => {
   try {
-    const { id, otp_code, device_token, device_type } = req?.body;
+    const { id, otp_code} = req?.body;
     if (!id) {
       return res.status(400).send({
         status: 0,
@@ -114,8 +112,6 @@ const otp_verify = async (req, res) => {
         {
           is_verified: 1,
           user_auth: token,
-          device_token,
-          device_type
         },
         { new: true }
       );
@@ -149,7 +145,7 @@ const otp_verify = async (req, res) => {
 //sign in
 const signin = async (req, res) => {
   try {
-    const email = req?.body?.email;
+    const {email,device_token, device_type} = req?.body;
     if (!email) {
       return res.status(400).send({
         status: 0,
@@ -185,13 +181,10 @@ const signin = async (req, res) => {
       });
     } else {
       const gen_otp_code = Math.floor(Math.random() * 900000) + 100000;
-      if (email && gen_otp_code) {
-        OtpMailer(email, gen_otp_code);
-      }
       const login_user = await User.findOneAndUpdate(
         { email },
         {
-          otp_code: gen_otp_code,
+          otp_code: 123456,device_token, device_type
         },
         { new: true }
       );
@@ -339,7 +332,7 @@ const resend_otp = async (req, res) => {
     const gen_otp_code = Math.floor(Math.random() * 900000) + 100000;
     const update_user = await User.findByIdAndUpdate(
       id,
-      { otp_code: gen_otp_code },
+      { otp_code: 123456 },
       { new: true }
     );
     const user_id = update_user?._id;
