@@ -388,7 +388,7 @@ const complete_profile = async (req, res) => {
     return res.status(200).send({
       status: 1,
       message: "complete profile successful",
-      user,
+      data:user,
     });
   } catch (err) {
     return res.status(500).send({
