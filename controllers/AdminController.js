@@ -7,10 +7,7 @@ const mongoose = require("mongoose");
 
 const signin = async (req, res) => {
   try {
-    const {
-      email: typed_email,
-      password: typed_password,
-    } = req.body;
+    const { email: typed_email, password: typed_password } = req.body;
     if (!typed_email) {
       return res.status(400).send({
         status: 0,
@@ -74,7 +71,7 @@ const signin = async (req, res) => {
       const token = createToken(user_id);
       const user = await Admin.findByIdAndUpdate(
         user_id,
-        { user_auth: token},
+        { user_auth: token },
         { new: true }
       );
       return res.status(200).send({
@@ -230,7 +227,7 @@ const forgot_password = async (req, res) => {
       {
         is_verified: 0,
         is_forgot_password: 1,
-        otp_code:123456,
+        otp_code: 123456,
         user_auth: "",
       },
       { new: true }
@@ -406,7 +403,7 @@ const signout = async (req, res) => {
     const user_id = req?.admin?._id;
     const signout_user = await Admin.findByIdAndUpdate(
       user_id,
-      { user_auth: null},
+      { user_auth: null },
       { new: true }
     );
     return res.status(200).send({
