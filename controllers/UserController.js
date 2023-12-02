@@ -6,7 +6,7 @@ const OtpMailer = require("../utils/OtpMailer");
 //sign up
 const signup = async (req, res) => {
   try {
-    const { email, device_token, device_type  } = req?.body;
+    const { email, device_token, device_type } = req?.body;
     if (!email) {
       return res.status(400).send({
         status: 0,
@@ -30,7 +30,8 @@ const signup = async (req, res) => {
     const signup_user = await User.create({
       email: email,
       otp_code: 123456,
-      device_token, device_type 
+      device_token,
+      device_type,
     });
     const user_id = signup_user?._id;
     if (signup_user) {
@@ -54,7 +55,7 @@ const signup = async (req, res) => {
 //verify otp
 const otp_verify = async (req, res) => {
   try {
-    const { id, otp_code} = req?.body;
+    const { id, otp_code } = req?.body;
     if (!id) {
       return res.status(400).send({
         status: 0,
@@ -145,7 +146,7 @@ const otp_verify = async (req, res) => {
 //sign in
 const signin = async (req, res) => {
   try {
-    const {email,device_token, device_type} = req?.body;
+    const { email, device_token, device_type } = req?.body;
     if (!email) {
       return res.status(400).send({
         status: 0,
@@ -184,7 +185,9 @@ const signin = async (req, res) => {
       const login_user = await User.findOneAndUpdate(
         { email },
         {
-          otp_code: 123456,device_token, device_type
+          otp_code: 123456,
+          device_token,
+          device_type,
         },
         { new: true }
       );
